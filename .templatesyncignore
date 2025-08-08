@@ -1,0 +1,8 @@
+.github/ISSUE_TEMPLATE/issue_template.md
+.vscode/*
+.pre-commit-config.yaml
+.editorconfig
+CHANGELOG.md
+CODEOWNERS
+LICENSE
+README.md

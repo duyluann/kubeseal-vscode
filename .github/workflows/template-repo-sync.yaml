@@ -1,0 +1,32 @@
+name: Template Repo Sync
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Runs every Monday at midnight
+  workflow_dispatch:
+
+jobs:
+  repo-sync:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+
+      - name: actions-template-sync
+        uses: AndreasAugustin/actions-template-sync@v2
+        with:
+          source_repo_path: duyl97/github-repo-template
+          upstream_branch: main
+          pr_labels: template_sync
+          pr_title: 'chore: New changes from template repo'
+          pr_body: |
+            ✨ Hurray! There are new changes from the template repo.
+            Merge ${SOURCE_REPO} with ${TEMPLATE_GIT_HASH}
+          is_force_push_pr: true
