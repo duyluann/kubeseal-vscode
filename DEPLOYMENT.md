@@ -128,7 +128,7 @@ To manually trigger a release:
 ## Workflow Steps
 
 1. **Checkout** - Gets the latest code
-2. **Setup Node.js** - Installs Node.js 18 with npm caching
+2. **Setup Node.js** - Installs Node.js 20 with npm caching
 3. **Install dependencies** - Runs `npm ci` for clean install
 4. **Install vsce** - Installs VS Code extension packaging tool
 5. **Build extension** - Compiles TypeScript to JavaScript
@@ -174,7 +174,7 @@ The semantic-release configuration is defined in `.releaserc.json`:
    - Verify organization access
 
 3. **Build Failures**
-   - Check Node.js version compatibility
+   - Check Node.js version compatibility (requires Node.js 20+)
    - Ensure all dependencies are installed
    - Verify TypeScript compilation
 

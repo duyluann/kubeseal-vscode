@@ -30,6 +30,10 @@ A Visual Studio Code extension that provides easy integration with `kubeseal` fo
 
 > **Important:** You must have access to your Kubernetes cluster before using this extension, especially for decryption.
 
+**Development Requirements:**
+- Node.js 20+ (for development and building)
+
+**Runtime Requirements:**
 - `kubeseal` binary must be installed and accessible in your PATH
 - `kubectl` binary must be installed and configured for cluster access
 - For encryption: A kubeseal certificate file (`.pem`, `.crt`, or `.cert`)
