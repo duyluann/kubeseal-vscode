@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.2.0](https://github.com/duyluann/kubeseal-vscode/compare/v1.1.0...v1.2.0) (2025-08-09)
+
+
+### Features
+
+* combine workflows into single semantic-release workflow ([de0db64](https://github.com/duyluann/kubeseal-vscode/commit/de0db6498fd9adf11b4d4d27168d500ba9b84035))
+* upgrade to Node.js 20 ([b20700a](https://github.com/duyluann/kubeseal-vscode/commit/b20700a72441f227dd989890c4e4cabfe6ee1707))
+
 # [1.1.0](https://github.com/duyluann/kubeseal-vscode/compare/v1.0.0...v1.1.0) (2025-08-09)
 
 
