@@ -1,16 +1,32 @@
 # Kubeseal VSCode Extension
 
+[![Version](https://img.shields.io/visual-studio-marketplace/v/devops4life.kubeseal-vscode.svg)](https://marketplace.visualstudio.com/items?itemName=devops4life.kubeseal-vscode)
+[![Downloads](https://img.shields.io/visual-studio-marketplace/d/devops4life.kubeseal-vscode.svg)](https://marketplace.visualstudio.com/items?itemName=devops4life.kubeseal-vscode)
+[![Rating](https://img.shields.io/visual-studio-marketplace/r/devops4life.kubeseal-vscode.svg)](https://marketplace.visualstudio.com/items?itemName=devops4life.kubeseal-vscode)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A Visual Studio Code extension that provides easy integration with `kubeseal` for encrypting and decrypting Kubernetes secrets.
 
-## Features
+## 🚀 Installation
 
-- **Encrypt Secrets**: Right-click on YAML files containing Kubernetes secrets to encrypt them using kubeseal
-- **Decrypt Secrets**: Retrieve the original content of sealed secrets from your Kubernetes cluster
-- **Base64 Encoding/Decoding**: Encode and decode base64 values in Kubernetes secret data fields
-- **Certificate Management**: Set and manage the path to your kubeseal certificate
-- **Context Menu Integration**: Access kubeseal operations directly from the file explorer and editor context menus
+**Install from VS Code Marketplace:**
+1. Open VS Code
+2. Go to Extensions (Ctrl+Shift+X)
+3. Search for "Kubeseal VSCode"
+4. Click Install
 
-## Requirements
+**Or install directly:**
+- [Install from Marketplace](https://marketplace.visualstudio.com/items?itemName=devops4life.kubeseal-vscode)
+
+## ✨ Features
+
+- **🔐 Encrypt Secrets**: Right-click on YAML files containing Kubernetes secrets to encrypt them using kubeseal
+- **🔓 Decrypt Secrets**: Retrieve the original content of sealed secrets from your Kubernetes cluster
+- **📝 Base64 Encoding/Decoding**: Encode and decode base64 values in Kubernetes secret data fields
+- **📋 Certificate Management**: Set and manage the path to your kubeseal certificate
+- **🎯 Context Menu Integration**: Access kubeseal operations directly from the file explorer and editor context menus
+
+## 📋 Requirements
 
 > **Important:** You must have access to your Kubernetes cluster before using this extension, especially for decryption.
 
@@ -19,24 +35,24 @@ A Visual Studio Code extension that provides easy integration with `kubeseal` fo
 - For encryption: A kubeseal certificate file (`.pem`, `.crt`, or `.cert`)
 - For decryption: Access to the Kubernetes cluster where the secret is deployed
 
-## Installation
+## 🛠️ Setup
 
 1. Install the `kubeseal` binary from [sealed-secrets releases](https://github.com/bitnami-labs/sealed-secrets/releases)
 2. Install this extension from the VS Code marketplace
 3. Configure the certificate path using the command palette: "Set Kubeseal Certificate Path"
 
-## Usage
+## 📖 Usage
 
 > **Note:** You must have access to your Kubernetes cluster before using the extension. Decryption will not work unless your `kubectl` is configured and you have the necessary permissions.
 
-### Encrypting Secrets
+### 🔐 Encrypting Secrets
 
 1. Create a Kubernetes secret YAML file
 2. Right-click on the file in the explorer or editor
 3. Select "Encrypt with Kubeseal"
 4. The encrypted file will be saved with `-sealed` suffix
 
-### Decrypting Secrets
+### 🔓 Decrypting Secrets
 
 1. Right-click on a sealed secret YAML file
 2. Select "Decrypt Secret"
@@ -49,12 +65,12 @@ A Visual Studio Code extension that provides easy integration with `kubeseal` fo
 - Your `kubectl` is configured to access the correct cluster
 - You have permissions to read secrets in the target namespace
 
-### Setting Certificate Path
+### 🔧 Setting Certificate Path
 
 - Use Command Palette: `Ctrl+Shift+P` → "Set Kubeseal Certificate Path"
 - Or configure in VS Code settings: `kubeseal.certPath`
 
-### Base64 Encoding/Decoding
+### 📝 Base64 Encoding/Decoding
 
 The extension provides utilities for working with base64 encoded values in Kubernetes secrets:
 
@@ -70,14 +86,14 @@ The extension provides utilities for working with base64 encoded values in Kuber
 2. Select **"Decode Base64 Values"**
 3. All base64 encoded values in the `data` field will be decoded to plain text
 
-## Configuration
+## ⚙️ Configuration
 
 The extension provides the following settings:
 
 - `kubeseal.certPath`: Path to the kubeseal certificate file
 - `kubeseal.kubesealPath`: Path to the kubeseal binary (default: "kubeseal")
 
-## Commands
+## 🎮 Commands
 
 - `kubeseal.encrypt`: Encrypt with Kubeseal
 - `kubeseal.decrypt`: Decrypt Secret
@@ -85,6 +101,16 @@ The extension provides the following settings:
 - `kubeseal.encodeBase64`: Encode Base64 Values
 - `kubeseal.decodeBase64`: Decode Base64 Values
 
-## License
+## 🤝 Contributing
 
-MIT
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔗 Links
+
+- [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=devops4life.kubeseal-vscode)
+- [GitHub Repository](https://github.com/duyluann/kubeseal-vscode)
+- [Sealed Secrets Documentation](https://github.com/bitnami-labs/sealed-secrets)
