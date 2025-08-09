@@ -63,14 +63,17 @@ jobs:
 
       - name: Upload VSIX to Release
         if: steps.get_version.outputs.published == 'true'
-        uses: actions/upload-release-asset@v1
+        run: |
+          # Get the release ID for the latest release
+          RELEASE_ID=$(gh api repos/${{ github.repository }}/releases/latest --jq '.id')
+
+          # Upload the VSIX file
+          gh api repos/${{ github.repository }}/releases/$RELEASE_ID/assets \
+            --field name="kubeseal-vscode-${{ steps.get_version.outputs.version }}.vsix" \
+            --field content_type="application/octet-stream" \
+            --upload-file "./kubeseal-vscode-${{ steps.get_version.outputs.version }}.vsix"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.semantic.outputs.upload_url }}
-          asset_path: ./kubeseal-vscode-${{ steps.get_version.outputs.version }}.vsix
-          asset_name: kubeseal-vscode-${{ steps.get_version.outputs.version }}.vsix
-          asset_content_type: application/octet-stream
 
       - name: Login to VS Code Marketplace
         if: env.MARKETPLACE_PAT != '' && steps.get_version.outputs.published == 'true'
