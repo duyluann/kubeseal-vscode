@@ -121,13 +121,9 @@ jobs:
       - name: Login to VS Code Marketplace
         run: |
           echo "${{ secrets.MARKETPLACE_PAT }}" | vsce login devops4life
-        env:
-          MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
 
       - name: Publish to VS Code Marketplace
         run: vsce publish
-        env:
-          MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
 
       - name: Notify success
         run: |
