@@ -1,14 +1,19 @@
-name: Release
+name: Release and Publish Extension
 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+
 jobs:
-  release:
-    name: Release
+  release-and-publish:
+    name: Release and Publish Extension
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      id-token: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,7 +21,26 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Release
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: Build extension
+        run: npm run compile
+
+      - name: Package extension
+        run: vsce package
+
+      - name: Semantic Release
+        id: semantic
         uses: cycjimmy/semantic-release-action@v4
         with:
           semantic_version: 18.0.0
@@ -25,3 +49,55 @@ jobs:
             @semantic-release/git@10.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get released version
+        id: get_version
+        run: |
+          if [ "${{ steps.semantic.outputs.new_release_published }}" = "true" ]; then
+            echo "version=${{ steps.semantic.outputs.new_release_version }}" >> $GITHUB_OUTPUT
+            echo "published=true" >> $GITHUB_OUTPUT
+          else
+            echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+            echo "published=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload VSIX to Release
+        if: steps.get_version.outputs.published == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.semantic.outputs.upload_url }}
+          asset_path: ./kubeseal-vscode-${{ steps.get_version.outputs.version }}.vsix
+          asset_name: kubeseal-vscode-${{ steps.get_version.outputs.version }}.vsix
+          asset_content_type: application/octet-stream
+
+      - name: Login to VS Code Marketplace
+        if: env.MARKETPLACE_PAT != '' && steps.get_version.outputs.published == 'true'
+        run: |
+          echo "${{ secrets.MARKETPLACE_PAT }}" | vsce login devops4life
+        env:
+          MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
+
+      - name: Publish to VS Code Marketplace
+        if: env.MARKETPLACE_PAT != '' && steps.get_version.outputs.published == 'true'
+        run: vsce publish
+        env:
+          MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
+
+      - name: Notify success
+        run: |
+          echo "✅ Workflow completed successfully!"
+          echo "📦 Version: ${{ steps.get_version.outputs.version }}"
+          echo "📦 Extension: devops4life.kubeseal-vscode"
+          if [ "${{ steps.get_version.outputs.published }}" = "true" ]; then
+            echo "🔗 GitHub Release: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.get_version.outputs.version }}"
+            echo "🔗 VS Code Marketplace: https://marketplace.visualstudio.com/items?itemName=devops4life.kubeseal-vscode"
+            if [ "${{ secrets.MARKETPLACE_PAT }}" != "" ]; then
+              echo "✅ Published to VS Code Marketplace"
+            else
+              echo "⚠️  Skipped marketplace publishing (no PAT configured)"
+            fi
+          else
+            echo "ℹ️  No new release published (no semantic version bump)"
+          fi
