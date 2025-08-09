@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.1.0](https://github.com/duyluann/kubeseal-vscode/compare/v1.0.0...v1.1.0) (2025-08-09)
+
+
+### Features
+
+* add icon and fix packaging issues ([7aff8f4](https://github.com/duyluann/kubeseal-vscode/commit/7aff8f4f177e370e3d8b8795ffccdc7714e8dca6))
+
 # 1.0.0 (2025-08-09)
 
 
