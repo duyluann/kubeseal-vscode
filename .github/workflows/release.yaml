@@ -36,9 +36,6 @@ jobs:
       - name: Build extension
         run: npm run compile
 
-      - name: Package extension
-        run: vsce package
-
       - name: Semantic Release
         id: semantic
         uses: cycjimmy/semantic-release-action@v4
@@ -60,6 +57,10 @@ jobs:
             echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
             echo "published=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Package extension (after version update)
+        if: steps.get_version.outputs.published == 'true'
+        run: vsce package
 
       - name: Upload VSIX to Release
         if: steps.get_version.outputs.published == 'true'
