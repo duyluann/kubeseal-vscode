@@ -1,0 +1,43 @@
+# Gitleaks configuration file
+# This file configures what secrets Gitleaks should detect and ignore
+
+[allowlist]
+# Allowlist patterns for false positives
+description = "Allowlist for false positive secrets"
+paths = [
+    # Documentation files
+    ".*\\.md$",
+    ".*\\.txt$",
+    ".*\\.rst$",
+    # Changelog and license
+    "CHANGELOG\\.md$",
+    "LICENSE$",
+]
+
+# Allowlist specific patterns that are known false positives
+regexes = [
+    # Example API keys in documentation
+    "AKIA[0-9A-Z]{16}",
+    # Example tokens in documentation
+    "ghp_[0-9a-zA-Z]{36}",
+    # Example passwords in documentation
+    "password123",
+    "test123",
+]
+
+# Allowlist specific commits (if needed)
+commits = [
+    # Add specific commit hashes here if needed
+]
+
+[output]
+format = "json"
+file = "gitleaks-report.json"
+verbose = true
+
+# Custom rules can be added here if needed
+[[rules]]
+id = "custom-rule"
+description = "Custom secret pattern"
+regex = '''custom-regex-pattern'''
+tags = ["custom", "secret"]
