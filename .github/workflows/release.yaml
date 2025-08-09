@@ -119,14 +119,12 @@ jobs:
           asset_content_type: application/json
 
       - name: Login to VS Code Marketplace
-        if: secrets.MARKETPLACE_PAT != '' && steps.release_info.outputs.published == 'true'
         run: |
           echo "${{ secrets.MARKETPLACE_PAT }}" | vsce login devops4life
         env:
           MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
 
       - name: Publish to VS Code Marketplace
-        if: secrets.MARKETPLACE_PAT != '' && steps.release_info.outputs.published == 'true'
         run: vsce publish
         env:
           MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
