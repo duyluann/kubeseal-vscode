@@ -135,7 +135,7 @@ jobs:
 
       # You don't actually need to "login" with vsce in CI; publish with a token instead.
       - name: Publish to VS Code Marketplace
-        if: secrets.MARKETPLACE_PAT != '' && steps.release_info.outputs.published == 'true'
+        if: steps.release_info.outputs.published == 'true'
         run: vsce publish -p "$MARKETPLACE_PAT"
         env:
           MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
