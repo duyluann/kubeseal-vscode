@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1](https://github.com/duyluann/kubeseal-vscode/compare/v1.2.0...v1.2.1) (2025-08-09)
+
+
+### Bug Fixes
+
+* resolve upload_url issue in release workflow ([1c4c32e](https://github.com/duyluann/kubeseal-vscode/commit/1c4c32e5fa64422a7aa57871f60ca7b08c6812f4))
+
 # [1.2.0](https://github.com/duyluann/kubeseal-vscode/compare/v1.1.0...v1.2.0) (2025-08-09)
 
 
