@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/duyluann/kubeseal-vscode/compare/v1.6.0...v1.7.0) (2025-08-09)
+
+
+### Features
+
+* update release configuration and workflow for improved asset handling and VSIX publishing ([fb2bd8a](https://github.com/duyluann/kubeseal-vscode/commit/fb2bd8a07ba6fd81250342c3b68a534057cc9b3a))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
