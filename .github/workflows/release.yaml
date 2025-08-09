@@ -47,44 +47,49 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get released version
-        id: get_version
+      - name: Get semantic release info
+        id: release_info
         run: |
           if [ "${{ steps.semantic.outputs.new_release_published }}" = "true" ]; then
-            echo "version=${{ steps.semantic.outputs.new_release_version }}" >> $GITHUB_OUTPUT
             echo "published=true" >> $GITHUB_OUTPUT
+            echo "version=${{ steps.semantic.outputs.new_release_version }}" >> $GITHUB_OUTPUT
+            echo "tag_name=${{ steps.semantic.outputs.new_release_tag_name }}" >> $GITHUB_OUTPUT
+            echo "release_url=${{ steps.semantic.outputs.new_release_url }}" >> $GITHUB_OUTPUT
           else
-            echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
             echo "published=false" >> $GITHUB_OUTPUT
+            echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
           fi
 
-      - name: Package extension (after version update)
-        if: steps.get_version.outputs.published == 'true'
-        run: vsce package
+      - name: Package extension with semantic version
+        if: steps.release_info.outputs.published == 'true'
+        run: |
+          echo "Packaging extension for version: ${{ steps.release_info.outputs.version }}"
+          vsce package --no-yarn
 
       - name: Upload VSIX to Release
-        if: steps.get_version.outputs.published == 'true'
+        if: steps.release_info.outputs.published == 'true'
         run: |
+          echo "Uploading VSIX for version: ${{ steps.release_info.outputs.version }}"
           # Get the release ID for the latest release
           RELEASE_ID=$(gh api repos/${{ github.repository }}/releases/latest --jq '.id')
 
           # Upload the VSIX file
           gh api repos/${{ github.repository }}/releases/$RELEASE_ID/assets \
-            --field name="kubeseal-vscode-${{ steps.get_version.outputs.version }}.vsix" \
+            --field name="kubeseal-vscode-${{ steps.release_info.outputs.version }}.vsix" \
             --field content_type="application/octet-stream" \
-            --upload-file "./kubeseal-vscode-${{ steps.get_version.outputs.version }}.vsix"
+            --upload-file "./kubeseal-vscode-${{ steps.release_info.outputs.version }}.vsix"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to VS Code Marketplace
-        if: env.MARKETPLACE_PAT != '' && steps.get_version.outputs.published == 'true'
+        if: env.MARKETPLACE_PAT != '' && steps.release_info.outputs.published == 'true'
         run: |
           echo "${{ secrets.MARKETPLACE_PAT }}" | vsce login devops4life
         env:
           MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
 
       - name: Publish to VS Code Marketplace
-        if: env.MARKETPLACE_PAT != '' && steps.get_version.outputs.published == 'true'
+        if: env.MARKETPLACE_PAT != '' && steps.release_info.outputs.published == 'true'
         run: vsce publish
         env:
           MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
@@ -92,10 +97,11 @@ jobs:
       - name: Notify success
         run: |
           echo "✅ Workflow completed successfully!"
-          echo "📦 Version: ${{ steps.get_version.outputs.version }}"
+          echo "📦 Version: ${{ steps.release_info.outputs.version }}"
           echo "📦 Extension: devops4life.kubeseal-vscode"
-          if [ "${{ steps.get_version.outputs.published }}" = "true" ]; then
-            echo "🔗 GitHub Release: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.get_version.outputs.version }}"
+          if [ "${{ steps.release_info.outputs.published }}" = "true" ]; then
+            echo "🏷️  Tag: ${{ steps.release_info.outputs.tag_name }}"
+            echo "🔗 GitHub Release: ${{ steps.release_info.outputs.release_url }}"
             echo "🔗 VS Code Marketplace: https://marketplace.visualstudio.com/items?itemName=devops4life.kubeseal-vscode"
             if [ "${{ secrets.MARKETPLACE_PAT }}" != "" ]; then
               echo "✅ Published to VS Code Marketplace"
