@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/duyluann/kubeseal-vscode/compare/v1.7.0...v1.7.1) (2025-08-09)
+
+
+### Bug Fixes
+
+* trigger ([af66106](https://github.com/duyluann/kubeseal-vscode/commit/af6610680b3f8411b4856225cd9a3acef55aaa03))
+
 # [1.7.0](https://github.com/duyluann/kubeseal-vscode/compare/v1.6.0...v1.7.0) (2025-08-09)
 
 
