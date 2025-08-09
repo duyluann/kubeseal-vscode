@@ -10,16 +10,11 @@
       "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
     }],
     ["@semantic-release/exec", {
-      "prepareCmd": "vsce package --no-yarn && echo VSIX=$(node -p \"require('./package.json').name + '-' + require('./package.json').version + '.vsix'\") >> $GITHUB_OUTPUT",
+      "prepareCmd": "vsce package --no-yarn",
       "publishCmd": "vsce publish -p $MARKETPLACE_PAT"
     }],
     ["@semantic-release/github", {
-      "assets": [
-        {
-          "path": "*.vsix",
-          "label": "VS Code Extension VSIX"
-        }
-      ]
+      "assets": [{ "path": "*.vsix", "label": "VS Code Extension VSIX" }]
     }]
   ]
 }
