@@ -16,7 +16,7 @@ A Visual Studio Code extension that provides easy integration with `kubeseal` fo
 4. Click Install
 
 **Or install directly:**
-- [Install from Marketplace](https://marketplace.visualstudio.com/items?itemName=devops4life.kubeseal-vscode)
+- [Download from Releases page](https://github.com/duyluann/kubeseal-vscode/releases)
 
 ## ✨ Features
 
