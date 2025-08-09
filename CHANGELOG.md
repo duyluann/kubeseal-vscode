@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.5.0](https://github.com/duyluann/kubeseal-vscode/compare/v1.4.0...v1.5.0) (2025-08-09)
+
+
+### Features
+
+* trigger ([29f44db](https://github.com/duyluann/kubeseal-vscode/commit/29f44db7e04c93d387a74bdf7fced47e32891d9f))
+
 # [1.4.0](https://github.com/duyluann/kubeseal-vscode/compare/v1.3.0...v1.4.0) (2025-08-09)
 
 
