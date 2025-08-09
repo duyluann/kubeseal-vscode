@@ -5,6 +5,9 @@ node_modules/
 *.ts
 !*.d.ts
 
+# Keep icon files
+!*.png
+
 # Development files
 .git/
 .github/

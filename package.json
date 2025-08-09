@@ -8,6 +8,7 @@
     "url": "https://github.com/duyluann/kubeseal-vscode.git"
   },
   "publisher": "devops4life",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.102.0"
   },
