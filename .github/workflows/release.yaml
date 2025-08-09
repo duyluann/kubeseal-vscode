@@ -60,10 +60,30 @@ jobs:
             echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
           fi
 
+      - name: Update package.json version if needed
+        if: steps.release_info.outputs.published == 'true'
+        run: |
+          echo "Current package.json version: $(node -p "require('./package.json').version")"
+          echo "Semantic release version: ${{ steps.release_info.outputs.version }}"
+
+          # Update package.json version to match semantic-release
+          npm version ${{ steps.release_info.outputs.version }} --no-git-tag-version
+
+          echo "Updated package.json version: $(node -p "require('./package.json').version")"
+
+      - name: Commit package.json version update
+        if: steps.release_info.outputs.published == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add package.json
+          git commit -m "chore: update package.json version to ${{ steps.release_info.outputs.version }}"
+
       - name: Package extension with semantic version
         if: steps.release_info.outputs.published == 'true'
         run: |
           echo "Packaging extension for version: ${{ steps.release_info.outputs.version }}"
+          echo "Package.json version: $(node -p "require('./package.json').version")"
           vsce package --no-yarn
 
       - name: Upload VSIX to Release
@@ -78,6 +98,12 @@ jobs:
             --field name="kubeseal-vscode-${{ steps.release_info.outputs.version }}.vsix" \
             --field content_type="application/octet-stream" \
             --upload-file "./kubeseal-vscode-${{ steps.release_info.outputs.version }}.vsix"
+
+          # Upload the updated package.json
+          gh api repos/${{ github.repository }}/releases/$RELEASE_ID/assets \
+            --field name="package.json" \
+            --field content_type="application/json" \
+            --upload-file "./package.json"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
