@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+# 1.0.0 (2025-08-09)
+
+
+### Features
+
+* Update README.md to include details about the Kubeseal VSCode extension, its features, requirements, installation, usage instructions, and configuration options. ([b3bf1fd](https://github.com/duyluann/kubeseal-vscode/commit/b3bf1fdc82aa797ab239e7c4ddbbad56c37be68f))
+
 # [1.11.0](https://github.com/duyluann/github-repo-template/compare/v1.10.0...v1.11.0) (2025-02-28)
 
 
