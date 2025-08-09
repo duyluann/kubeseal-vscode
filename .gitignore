@@ -16,8 +16,8 @@ node_modules/
 build/*
 
 # Package managers
-package-lock.json
-yarn.lock
+# package-lock.json
+# yarn.lock
 
 # Testing
 coverage/*
