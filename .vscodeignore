@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+*.ts
+!*.d.ts
+
+# Development files
+.git/
+.github/
+.vscode/
+.editorconfig
+.pre-commit-config.yaml
+.releaserc.json
+.templatesyncignore
+.gitignore
+CODEOWNERS
+
+# Test files
+test-*.yaml
+
+# Development scripts
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+*.code-workspace
+
+# Temporary files
+*.tmp
+*.temp

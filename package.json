@@ -1,0 +1,113 @@
+{
+  "name": "kubeseal-vscode",
+  "displayName": "Kubeseal VSCode",
+  "description": "VS Code extension for encrypting and decrypting Kubernetes secrets using kubeseal",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/duyluann/kubeseal-vscode.git"
+  },
+  "engines": {
+    "vscode": "^1.102.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "kubeseal.encrypt",
+        "title": "Encrypt with Kubeseal"
+      },
+      {
+        "command": "kubeseal.decrypt",
+        "title": "Decrypt Secret"
+      },
+      {
+        "command": "kubeseal.setCertPath",
+        "title": "Set Kubeseal Certificate Path"
+      },
+      {
+        "command": "kubeseal.encodeBase64",
+        "title": "Encode Base64 Values"
+      },
+      {
+        "command": "kubeseal.decodeBase64",
+        "title": "Decode Base64 Values"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "resourceExtname =~ /\\.(yaml|yml)$/",
+          "command": "kubeseal.encrypt",
+          "group": "kubeseal"
+        },
+        {
+          "when": "resourceExtname =~ /\\.(yaml|yml)$/",
+          "command": "kubeseal.decrypt",
+          "group": "kubeseal"
+        },
+        {
+          "when": "resourceExtname =~ /\\.(yaml|yml)$/",
+          "command": "kubeseal.encodeBase64",
+          "group": "kubeseal@encode"
+        },
+        {
+          "when": "resourceExtname =~ /\\.(yaml|yml)$/",
+          "command": "kubeseal.decodeBase64",
+          "group": "kubeseal@encode"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceExtname =~ /\\.(yaml|yml)$/",
+          "command": "kubeseal.encrypt",
+          "group": "kubeseal"
+        },
+        {
+          "when": "resourceExtname =~ /\\.(yaml|yml)$/",
+          "command": "kubeseal.decrypt",
+          "group": "kubeseal"
+        },
+        {
+          "when": "resourceExtname =~ /\\.(yaml|yml)$/",
+          "command": "kubeseal.encodeBase64",
+          "group": "kubeseal@encode"
+        },
+        {
+          "when": "resourceExtname =~ /\\.(yaml|yml)$/",
+          "command": "kubeseal.decodeBase64",
+          "group": "kubeseal@encode"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Kubeseal",
+      "properties": {
+        "kubeseal.certPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the kubeseal certificate file"
+        },
+        "kubeseal.kubesealPath": {
+          "type": "string",
+          "default": "kubeseal",
+          "description": "Path to the kubeseal binary"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.126",
+    "@types/vscode": "^1.102.0",
+    "typescript": "^4.9.5"
+  }
+}

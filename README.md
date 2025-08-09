@@ -1,77 +1,90 @@
-# 🛠️ GitHub Repo Template
+# Kubeseal VSCode Extension
 
-Welcome to the Template Repository on GitHub! This repository is designed to serve as a starting point for creating new Git repositories with best practices and configurations already set up. Below is a brief overview of the structure and the purpose of each file and directory in this repository.
+A Visual Studio Code extension that provides easy integration with `kubeseal` for encrypting and decrypting Kubernetes secrets.
 
-## 📁 Repository Structure
+## Features
 
-```text
-.
-├── .editorconfig                       # 🖊️ Configuration for consistent coding styles
-├── .github                             # 🛠️ GitHub-specific configurations
-│   ├── ISSUE_TEMPLATE                  # 📝 GitHub issue template
-│   │   └── issue_template.md           # 📝 Issue template file
-│   ├── dependabot.yml                  # 🤖 Dependabot configuration
-│   ├── pull_request_template.md        # 📝 Pull request template
-│   └── workflows                       # ⚙️ GitHub Actions workflows
-│       ├── deps-review.yaml            # 📋 Dependency review workflow
-│       ├── lint-pr.yaml                # 🧹 Linting workflow for pull requests
-│       ├── pre-commit-auto-update.yaml # 🔄 Pre-commit hook auto-update workflow
-│       ├── release.yaml                # 🚀 Release workflow
-│       ├── stale.yaml                  # ⏳ Stale issue management workflow
-│       └── template-repo-sync.yaml     # 🔄 Template repository sync workflow
-├── .gitignore                          # 🚫 Files and directories to be ignored by Git
-├── .pre-commit-config.yaml             # 🛠️ Pre-commit hooks configuration
-├── .releaserc.json                     # 🚀 Semantic release configuration
-├── .vscode                             # 🖥️ VSCode-specific configurations
-│   └── extensions.json                 # 🛠️ Recommended extensions for VSCode
-├── CHANGELOG.md                        # 📝 Change log of the project
-├── CODEOWNERS                          # 👥 Defines the code owners for the repository
-├── LICENSE                             # ⚖️ License for the project
-└── README.md                           # 📖 Project documentation (this file)
-```
-## ⚙️ Semantic Commit Messages
-This project uses [Semantic Commit Messages](https://www.conventionalcommits.org/) to ensure meaningful and consistent commit history. The format is as follows:
+- **Encrypt Secrets**: Right-click on YAML files containing Kubernetes secrets to encrypt them using kubeseal
+- **Decrypt Secrets**: Retrieve the original content of sealed secrets from your Kubernetes cluster
+- **Base64 Encoding/Decoding**: Encode and decode base64 values in Kubernetes secret data fields
+- **Certificate Management**: Set and manage the path to your kubeseal certificate
+- **Context Menu Integration**: Access kubeseal operations directly from the file explorer and editor context menus
 
-```php
-<type>(<scope>): <subject>
-```
+## Requirements
 
-### Types
+> **Important:** You must have access to your Kubernetes cluster before using this extension, especially for decryption.
 
-- `feat`: A new feature (e.g., `feat: add login functionality`).
-- `fix`: A bug fix (e.g., `fix: resolve login button issue`).
-- `docs`: Documentation changes (e.g., `docs: update API documentation`).
-- `style`: Code style changes (formatting, missing semi-colons, etc.) without changing logic (e.g., `style: fix indentation`).
-- `refactor`: Code changes that neither fix a bug nor add a feature (e.g., `refactor: update user controller structure`).
-- `test`: Adding or updating tests (e.g., `test: add unit tests for login service`).
-- `chore`: Changes to build process, auxiliary tools, or libraries (e.g., `chore: update dependencies`).
+- `kubeseal` binary must be installed and accessible in your PATH
+- `kubectl` binary must be installed and configured for cluster access
+- For encryption: A kubeseal certificate file (`.pem`, `.crt`, or `.cert`)
+- For decryption: Access to the Kubernetes cluster where the secret is deployed
 
-### Scope
+## Installation
 
-Optional: The part of the codebase affected by the change (e.g., `feat(auth): add OAuth support`)
+1. Install the `kubeseal` binary from [sealed-secrets releases](https://github.com/bitnami-labs/sealed-secrets/releases)
+2. Install this extension from the VS Code marketplace
+3. Configure the certificate path using the command palette: "Set Kubeseal Certificate Path"
 
-### Subject
+## Usage
 
-A brief description of the change, using the imperative mood (e.g., `fix: resolve issue with user authentication`).
+> **Note:** You must have access to your Kubernetes cluster before using the extension. Decryption will not work unless your `kubectl` is configured and you have the necessary permissions.
 
-## 🚀 Semantic Release
+### Encrypting Secrets
 
-This project is configured with [Semantic Release](https://semantic-release.gitbook.io/semantic-release) to automate the release process based on your commit messages.
+1. Create a Kubernetes secret YAML file
+2. Right-click on the file in the explorer or editor
+3. Select "Encrypt with Kubeseal"
+4. The encrypted file will be saved with `-sealed` suffix
 
-### How It Works
+### Decrypting Secrets
 
-1. Analyze commits: Semantic Release inspects commit messages to determine the type of changes in the codebase.
-2. Generate release version: Based on the commit type, it will automatically bump the version following semantic versioning:
-- fix → Patch release (e.g., 1.0.1)
-- feat → Minor release (e.g., 1.1.0)
-- BREAKING CHANGE → Major release (e.g., 2.0.0)
-3. Create release notes: It generates a changelog from the commit messages and includes it in the release.
-4. Publish: It automatically publishes the new version to the repository (and any other configured registries, e.g., npm).
+1. Right-click on a sealed secret YAML file
+2. Select "Decrypt Secret"
+3. The extension will retrieve the actual secret from your Kubernetes cluster using `kubectl`
+4. The decrypted secret will be saved with `-unsealed` suffix
 
-## 🤝 Contributing
+**Note**: This requires that:
 
-If you find any issues or have suggestions for improving this template repository, please feel free to open an issue or submit a pull request. Contributions are always welcome!
+- The sealed secret has been deployed to your cluster
+- Your `kubectl` is configured to access the correct cluster
+- You have permissions to read secrets in the target namespace
 
-## 📜 License
+### Setting Certificate Path
 
-This repository is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+- Use Command Palette: `Ctrl+Shift+P` → "Set Kubeseal Certificate Path"
+- Or configure in VS Code settings: `kubeseal.certPath`
+
+### Base64 Encoding/Decoding
+
+The extension provides utilities for working with base64 encoded values in Kubernetes secrets:
+
+#### Encode Base64 Values
+
+1. Right-click on a Kubernetes secret YAML file
+2. Select **"Encode Base64 Values"**
+3. All plain text values in the `data` field will be base64 encoded
+
+#### Decode Base64 Values
+
+1. Right-click on a Kubernetes secret YAML file
+2. Select **"Decode Base64 Values"**
+3. All base64 encoded values in the `data` field will be decoded to plain text
+
+## Configuration
+
+The extension provides the following settings:
+
+- `kubeseal.certPath`: Path to the kubeseal certificate file
+- `kubeseal.kubesealPath`: Path to the kubeseal binary (default: "kubeseal")
+
+## Commands
+
+- `kubeseal.encrypt`: Encrypt with Kubeseal
+- `kubeseal.decrypt`: Decrypt Secret
+- `kubeseal.setCertPath`: Set Kubeseal Certificate Path
+- `kubeseal.encodeBase64`: Encode Base64 Values
+- `kubeseal.decodeBase64`: Decode Base64 Values
+
+## License
+
+MIT
