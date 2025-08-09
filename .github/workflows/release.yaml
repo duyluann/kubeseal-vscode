@@ -51,13 +51,13 @@ jobs:
         id: release_info
         run: |
           if [ "${{ steps.semantic.outputs.new_release_published }}" = "true" ]; then
-            echo "published=true" >> $GITHUB_OUTPUT
-            echo "version=${{ steps.semantic.outputs.new_release_version }}" >> $GITHUB_OUTPUT
-            echo "tag_name=${{ steps.semantic.outputs.new_release_tag_name }}" >> $GITHUB_OUTPUT
-            echo "release_url=${{ steps.semantic.outputs.new_release_url }}" >> $GITHUB_OUTPUT
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "version=${{ steps.semantic.outputs.new_release_version }}" >> "$GITHUB_OUTPUT"
+            echo "tag_name=${{ steps.semantic.outputs.new_release_tag_name }}" >> "$GITHUB_OUTPUT"
+            echo "release_url=${{ steps.semantic.outputs.new_release_url }}" >> "$GITHUB_OUTPUT"
           else
-            echo "published=false" >> $GITHUB_OUTPUT
-            echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Update package.json version if needed
@@ -73,28 +73,42 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add package.json
+          git add package.json package-lock.json 2>/dev/null || true
           git commit -m "chore: update package.json version to ${{ steps.release_info.outputs.version }}" || echo "No changes to commit"
 
       - name: Package extension with semantic version
         if: steps.release_info.outputs.published == 'true'
         id: package
         run: |
+          set -euo pipefail
           echo "Packaging extension for version: ${{ steps.release_info.outputs.version }}"
           echo "Package.json version: $(node -p "require('./package.json').version")"
           vsce package --no-yarn
-          echo "vsix_file=$(ls *.vsix)" >> "$GITHUB_OUTPUT"
 
+          # Compute the expected filename from package.json (no globbing)
+          NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          VSIX_FILE="${NAME}-${VERSION}.vsix"
+
+          if [ ! -f "$VSIX_FILE" ]; then
+            echo "Error: Expected VSIX '$VSIX_FILE' not found. Listing directory:"
+            ls -la
+            exit 1
+          fi
+
+          # Write output safely
+          printf 'vsix_file=%s\n' "$VSIX_FILE" >> "$GITHUB_OUTPUT"
+
+      # ===== Use upload-release-asset action =====
       - name: Get release upload_url
         if: steps.release_info.outputs.published == 'true'
         id: release_meta
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api repos/${{ github.repository }}/releases/tags/${{ steps.release_info.outputs.tag_name }} \
-            --jq '.upload_url' \
-          | sed 's/{?name,label}//' \
-          | awk '{print "upload_url="$0}' >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          URL=$(gh api repos/${{ github.repository }}/releases/tags/${{ steps.release_info.outputs.tag_name }} --jq '.upload_url' | sed 's/{?name,label}//')
+          printf 'upload_url=%s\n' "$URL" >> "$GITHUB_OUTPUT"
 
       - name: Upload VSIX to Release
         if: steps.release_info.outputs.published == 'true'
@@ -117,13 +131,14 @@ jobs:
           asset_path: package.json
           asset_name: package.json
           asset_content_type: application/json
+      # ==========================================
 
-      - name: Login to VS Code Marketplace
-        run: |
-          echo "${{ secrets.MARKETPLACE_PAT }}" | vsce login devops4life
-
+      # You don't actually need to "login" with vsce in CI; publish with a token instead.
       - name: Publish to VS Code Marketplace
-        run: vsce publish
+        if: secrets.MARKETPLACE_PAT != '' && steps.release_info.outputs.published == 'true'
+        run: vsce publish -p "$MARKETPLACE_PAT"
+        env:
+          MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
 
       - name: Notify success
         run: |
