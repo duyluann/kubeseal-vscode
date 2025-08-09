@@ -65,10 +65,7 @@ jobs:
         run: |
           echo "Current package.json version: $(node -p "require('./package.json').version")"
           echo "Semantic release version: ${{ steps.release_info.outputs.version }}"
-
-          # Update package.json version to match semantic-release
           npm version ${{ steps.release_info.outputs.version }} --no-git-tag-version
-
           echo "Updated package.json version: $(node -p "require('./package.json').version")"
 
       - name: Commit package.json version update
@@ -77,45 +74,59 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add package.json
-          git commit -m "chore: update package.json version to ${{ steps.release_info.outputs.version }}"
+          git commit -m "chore: update package.json version to ${{ steps.release_info.outputs.version }}" || echo "No changes to commit"
 
       - name: Package extension with semantic version
         if: steps.release_info.outputs.published == 'true'
+        id: package
         run: |
           echo "Packaging extension for version: ${{ steps.release_info.outputs.version }}"
           echo "Package.json version: $(node -p "require('./package.json').version")"
           vsce package --no-yarn
+          echo "vsix_file=$(ls *.vsix)" >> "$GITHUB_OUTPUT"
+
+      - name: Get release upload_url
+        if: steps.release_info.outputs.published == 'true'
+        id: release_meta
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }}/releases/tags/${{ steps.release_info.outputs.tag_name }} \
+            --jq '.upload_url' \
+          | sed 's/{?name,label}//' \
+          | awk '{print "upload_url="$0}' >> "$GITHUB_OUTPUT"
 
       - name: Upload VSIX to Release
         if: steps.release_info.outputs.published == 'true'
-        run: |
-          echo "Uploading VSIX for version: ${{ steps.release_info.outputs.version }}"
-          # Get the release ID for the latest release
-          RELEASE_ID=$(gh api repos/${{ github.repository }}/releases/latest --jq '.id')
-
-          # Upload the VSIX file
-          gh api repos/${{ github.repository }}/releases/$RELEASE_ID/assets \
-            --field name="kubeseal-vscode-${{ steps.release_info.outputs.version }}.vsix" \
-            --field content_type="application/octet-stream" \
-            --upload-file "./kubeseal-vscode-${{ steps.release_info.outputs.version }}.vsix"
-
-          # Upload the updated package.json
-          gh api repos/${{ github.repository }}/releases/$RELEASE_ID/assets \
-            --field name="package.json" \
-            --field content_type="application/json" \
-            --upload-file "./package.json"
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release_meta.outputs.upload_url }}
+          asset_path: ${{ steps.package.outputs.vsix_file }}
+          asset_name: ${{ steps.package.outputs.vsix_file }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload package.json to Release
+        if: steps.release_info.outputs.published == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release_meta.outputs.upload_url }}
+          asset_path: package.json
+          asset_name: package.json
+          asset_content_type: application/json
 
       - name: Login to VS Code Marketplace
-        if: env.MARKETPLACE_PAT != '' && steps.release_info.outputs.published == 'true'
+        if: secrets.MARKETPLACE_PAT != '' && steps.release_info.outputs.published == 'true'
         run: |
           echo "${{ secrets.MARKETPLACE_PAT }}" | vsce login devops4life
         env:
           MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
 
       - name: Publish to VS Code Marketplace
-        if: env.MARKETPLACE_PAT != '' && steps.release_info.outputs.published == 'true'
+        if: secrets.MARKETPLACE_PAT != '' && steps.release_info.outputs.published == 'true'
         run: vsce publish
         env:
           MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
