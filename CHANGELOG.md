@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.2](https://github.com/duyluann/kubeseal-vscode/compare/v1.2.1...v1.2.2) (2025-08-09)
+
+
+### Bug Fixes
+
+* package extension after semantic-release version update ([3f5d4fb](https://github.com/duyluann/kubeseal-vscode/commit/3f5d4fb49fcac64d4c7ff972fce2e32f755d0803))
+
 ## [1.2.1](https://github.com/duyluann/kubeseal-vscode/compare/v1.2.0...v1.2.1) (2025-08-09)
 
 
