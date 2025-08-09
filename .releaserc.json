@@ -13,7 +13,7 @@
       "publishCmd": "vsce publish -p $MARKETPLACE_PAT"
     }],
     ["@semantic-release/github", {
-      "assets": [{ "path": "*.vsix", "label": "VS Code Extension VSIX" }]
+      "assets": [{ "path": "*.vsix", "label": "Kubeseal VSCode Extension" }]
     }]
   ]
 }
