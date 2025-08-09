@@ -10,7 +10,6 @@
       "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
     }],
     ["@semantic-release/exec", {
-      "prepareCmd": "vsce package --no-yarn",
       "publishCmd": "vsce publish -p $MARKETPLACE_PAT"
     }],
     ["@semantic-release/github", {
