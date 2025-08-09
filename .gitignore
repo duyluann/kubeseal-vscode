@@ -27,3 +27,7 @@ coverage/*
 
 # Personal files
 README.personal.md
+
+# Gitleaks reports
+gitleaks-report.json
+gitleaks-report.txt
