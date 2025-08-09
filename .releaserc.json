@@ -1,36 +1,25 @@
 {
-  "branches": [
-    "main",
-    "master"
-  ],
-  "ci": false,
+  "branches": ["main"],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    [
-      "@semantic-release/github",
-      {
-        "successComment":
-        "This ${issue.pull_request ? 'PR is included' : 'issue has been resolved'} in version ${nextRelease.version} :tada:",
-        "labels": false,
-        "releasedLabels": false
-      }
-    ],
-    [
-      "@semantic-release/changelog",
-      {
-        "changelogFile": "CHANGELOG.md",
-        "changelogTitle": "# Changelog\n\nAll notable changes to this project will be documented in this file."
-      }
-    ],
-    [
-      "@semantic-release/git",
-      {
-        "assets": [
-          "CHANGELOG.md"
-        ],
-        "message": "chore(release): version ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-      }
-    ]
+    "@semantic-release/changelog",
+    ["@semantic-release/npm", { "npmPublish": false }],
+    ["@semantic-release/git", {
+      "assets": ["CHANGELOG.md", "package.json", "package-lock.json"],
+      "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+    }],
+    ["@semantic-release/exec", {
+      "prepareCmd": "vsce package --no-yarn && echo VSIX=$(node -p \"require('./package.json').name + '-' + require('./package.json').version + '.vsix'\") >> $GITHUB_OUTPUT",
+      "publishCmd": "vsce publish -p $MARKETPLACE_PAT"
+    }],
+    ["@semantic-release/github", {
+      "assets": [
+        {
+          "path": "*.vsix",
+          "label": "VS Code Extension VSIX"
+        }
+      ]
+    }]
   ]
 }

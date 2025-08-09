@@ -18,7 +18,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
           fetch-depth: 0
 
       - name: Setup Node.js
@@ -33,127 +32,19 @@ jobs:
       - name: Install vsce
         run: npm install -g @vscode/vsce
 
-      - name: Build extension
+      - name: Build (CI sanity)
         run: npm run compile
 
       - name: Semantic Release
-        id: semantic
         uses: cycjimmy/semantic-release-action@v4
         with:
           semantic_version: 18.0.0
           extra_plugins: |
             @semantic-release/changelog@6.0.0
             @semantic-release/git@10.0.0
+            @semantic-release/npm@11.0.0
+            @semantic-release/exec@6.0.3
+            @semantic-release/github@10.0.6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get semantic release info
-        id: release_info
-        run: |
-          if [ "${{ steps.semantic.outputs.new_release_published }}" = "true" ]; then
-            echo "published=true" >> "$GITHUB_OUTPUT"
-            echo "version=${{ steps.semantic.outputs.new_release_version }}" >> "$GITHUB_OUTPUT"
-            echo "tag_name=${{ steps.semantic.outputs.new_release_tag_name }}" >> "$GITHUB_OUTPUT"
-            echo "release_url=${{ steps.semantic.outputs.new_release_url }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "published=false" >> "$GITHUB_OUTPUT"
-            echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Update package.json version if needed
-        if: steps.release_info.outputs.published == 'true'
-        run: |
-          echo "Current package.json version: $(node -p "require('./package.json').version")"
-          echo "Semantic release version: ${{ steps.release_info.outputs.version }}"
-          npm version ${{ steps.release_info.outputs.version }} --no-git-tag-version
-          echo "Updated package.json version: $(node -p "require('./package.json').version")"
-
-      - name: Commit package.json version update
-        if: steps.release_info.outputs.published == 'true'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add package.json package-lock.json 2>/dev/null || true
-          git commit -m "chore: update package.json version to ${{ steps.release_info.outputs.version }}" || echo "No changes to commit"
-
-      - name: Package extension with semantic version
-        if: steps.release_info.outputs.published == 'true'
-        id: package
-        run: |
-          set -euo pipefail
-          echo "Packaging extension for version: ${{ steps.release_info.outputs.version }}"
-          echo "Package.json version: $(node -p "require('./package.json').version")"
-          vsce package --no-yarn
-
-          # Compute the expected filename from package.json (no globbing)
-          NAME=$(node -p "require('./package.json').name")
-          VERSION=$(node -p "require('./package.json').version")
-          VSIX_FILE="${NAME}-${VERSION}.vsix"
-
-          if [ ! -f "$VSIX_FILE" ]; then
-            echo "Error: Expected VSIX '$VSIX_FILE' not found. Listing directory:"
-            ls -la
-            exit 1
-          fi
-
-          # Write output safely
-          printf 'vsix_file=%s\n' "$VSIX_FILE" >> "$GITHUB_OUTPUT"
-
-      # ===== Use upload-release-asset action =====
-      - name: Get release upload_url
-        if: steps.release_info.outputs.published == 'true'
-        id: release_meta
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          URL=$(gh api repos/${{ github.repository }}/releases/tags/${{ steps.release_info.outputs.tag_name }} --jq '.upload_url' | sed 's/{?name,label}//')
-          printf 'upload_url=%s\n' "$URL" >> "$GITHUB_OUTPUT"
-
-      - name: Upload VSIX to Release
-        if: steps.release_info.outputs.published == 'true'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.release_meta.outputs.upload_url }}
-          asset_path: ${{ steps.package.outputs.vsix_file }}
-          asset_name: ${{ steps.package.outputs.vsix_file }}
-          asset_content_type: application/octet-stream
-
-      - name: Upload package.json to Release
-        if: steps.release_info.outputs.published == 'true'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.release_meta.outputs.upload_url }}
-          asset_path: package.json
-          asset_name: package.json
-          asset_content_type: application/json
-      # ==========================================
-
-      # You don't actually need to "login" with vsce in CI; publish with a token instead.
-      - name: Publish to VS Code Marketplace
-        if: steps.release_info.outputs.published == 'true'
-        run: vsce publish -p "$MARKETPLACE_PAT"
-        env:
           MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
-
-      - name: Notify success
-        run: |
-          echo "✅ Workflow completed successfully!"
-          echo "📦 Version: ${{ steps.release_info.outputs.version }}"
-          echo "📦 Extension: devops4life.kubeseal-vscode"
-          if [ "${{ steps.release_info.outputs.published }}" = "true" ]; then
-            echo "🏷️  Tag: ${{ steps.release_info.outputs.tag_name }}"
-            echo "🔗 GitHub Release: ${{ steps.release_info.outputs.release_url }}"
-            echo "🔗 VS Code Marketplace: https://marketplace.visualstudio.com/items?itemName=devops4life.kubeseal-vscode"
-            if [ "${{ secrets.MARKETPLACE_PAT }}" != "" ]; then
-              echo "✅ Published to VS Code Marketplace"
-            else
-              echo "⚠️  Skipped marketplace publishing (no PAT configured)"
-            fi
-          else
-            echo "ℹ️  No new release published (no semantic version bump)"
-          fi
