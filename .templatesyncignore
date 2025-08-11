@@ -6,3 +6,6 @@ CHANGELOG.md
 CODEOWNERS
 LICENSE
 README.md
+.github/workflows/release.yaml
+.gitignore
+.releaserc.json
