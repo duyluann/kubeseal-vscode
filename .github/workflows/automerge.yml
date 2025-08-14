@@ -10,10 +10,13 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     if: |
-      github.actor == 'github-actions[bot]' &&
       (
-        startsWith(github.head_ref, 'update-license-') ||
-        github.head_ref == 'update-pre-commit-hooks'
+        github.actor == 'github-actions[bot]' && (
+          startsWith(github.head_ref, 'update-license-') ||
+          github.head_ref == 'update-pre-commit-hooks'
+        )
+      ) || (
+        github.actor == 'dependabot[bot]'
       )
     steps:
       - uses: peter-evans/enable-pull-request-automerge@v3
