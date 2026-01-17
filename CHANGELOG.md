@@ -1,3 +1,5 @@
+## [2.1.4](https://github.com/duyluann/kubeseal-vscode/compare/v2.1.3...v2.1.4) (2026-01-17)
+
 ## [2.1.3](https://github.com/duyluann/kubeseal-vscode/compare/v2.1.2...v2.1.3) (2025-11-27)
 
 
