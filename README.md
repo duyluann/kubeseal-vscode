@@ -1,3 +1,4 @@
+> [!IMPORTANT]
 > **This repository has been moved to [ops4life/kubeseal-vscode](https://github.com/ops4life/kubeseal-vscode).**
 > Please visit the new repository for the latest updates, issues, and contributions.
 
